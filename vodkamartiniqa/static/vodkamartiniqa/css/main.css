@@ -1,0 +1,39 @@
+.vote {
+    padding: 5px;
+    width: 300px;
+}
+
+.vote a {
+    cursor: pointer;
+    font-size: 28px;
+    display: block;
+}
+
+.vote a.vote-up-on,
+.vote a.vote-down-on {
+    color: red;
+}
+
+.vote a.vote-up-disabled,
+.vote a.vote-down-disabled,
+.vote a.vote-up-off,
+.vote a.vote-down-off {
+    color: gray;
+}
+
+.votes-summary {
+    margin-top: 20px;
+    border: 1px solid green;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.votes-up {
+    color: green;
+}
+
+.votes-down {
+    color: red;
+    border: 1px solid red;
+}

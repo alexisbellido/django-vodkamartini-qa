@@ -1,0 +1,14 @@
+{% extends "vodkamartiniqa/base_questions.html" %}
+
+{% block title %}Question Search Results{% endblock %}
+
+{% block content %}
+  <h2>Question Search Results</h2>
+  {% if questions %}
+    {% for object in questions %}
+        <p><a href="{{ object.get_absolute_url }}">{{ object.title }}</a></p>
+    {% endfor %}
+  {% else %}
+    <p>No results.</p>
+  {% endif  %}
+{% endblock %}

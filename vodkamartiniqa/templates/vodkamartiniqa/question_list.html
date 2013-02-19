@@ -1,0 +1,43 @@
+{% extends "vodkamartiniqa/base_questions.html" %}
+
+{% block title %}{{ block.super }} | All Questions{% endblock %}
+
+{% block content %}
+{% load url from future %}
+
+<h1>Questions list</h1>
+{% for object in object_list %}
+    <article>
+        <h2>{{ object.title }}</h2>
+        <p>Published on {{ object.created|date:"F j, Y" }} by {{ object.author.username }}</p>
+        {% if object.teaser_html %}
+            {{ object.teaser_html|safe }}
+        {% else %}
+            {{ object.body_html|truncatewords_html:"50"|safe }}
+        {% endif %}
+        <p>Answers: {{ object.num_answers }}</p>
+        <p>(votes up: {{ object.votes_up }} | votes down: {{ object.votes_down }})</p>
+        <p><a href="{{ object.get_absolute_url }}">Read full entry</a></p>
+    </article>
+{% endfor %}
+
+<div class="pagination">
+
+    {% if questions.has_previous %}
+        {% if questions.previous_page_number == 1 %}
+            <a href="{% url 'vodkamartiniqa_questions_home' %}">previous</a>
+        {% else %}
+            <a href="{% url 'vodkamartiniqa_questions_index' page=questions.previous_page_number %}">previous</a>
+        {% endif %}
+    {% endif %}
+
+    <span class="current">
+        Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
+    </span>
+
+    {% if questions.has_next %}
+        <a href="{% url 'vodkamartiniqa_questions_index' page=questions.next_page_number %}">next</a>
+    {% endif %}
+</div>
+
+{% endblock %}

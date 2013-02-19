@@ -1,0 +1,85 @@
+Questions and Answers
+
+The community asks; the community answers.
+
+It inherits features from vokmartini-article, such as feeds and image upload.
+
+Some useful aggregates and annotations
+===========================================
+
+Users queryset, adds number of answers published by each user.
+User.objects.annotate(num_answers=Count('answer'))
+
+Average number of answers among all users.
+User.objects.annotate(num_answers=Count('answer')).aggregate(Avg('num_answers'))
+
+Users queryset, adds number of questions published by each user which are live. Notice the filter is before the annotation.
+users = User.objects.filter(question__status=Question.LIVE_STATUS).annotate(num_questions=Count('question')).order_by('-num_questions')
+
+Find maximum number of votes in answers for one question:
+q1.answer_set.aggregate(max_votes=Max('votes_up'))
+
+Questions order by their total number of answers.
+Question.live.annotate(num_answers=Count('answer')).order_by('-num_answers')
+
+Version 0.1
+===========
+
+- User authentication.
+- Ask and answer question.
+
+Version 0.2
+===========
+
+Version 0.4
+===========
+Memcached support.
+
+Version 0.5
+===========
+Redis support.
+
+...
+...
+...
+
+Version 1.0
+===========
+
+- Vote for best answer for a question.
+- Basic template for desktop and mobile.
+- Search for questions.
+- Autocomplete question from search before asking a new one.
+- Featured questions based on user reputation or credits.
+- Credits system.
+- Direct question to an expert, or any other user.
+- Advanced questions for paid members with a limited number of questions for experts per month.
+- Featured answers based on credits or user roles (for example "experts").
+- Follow a question.
+- Follow a person.
+- Build reputation based on answers and other forms of participation.
+- Notifications while browsing and via email or other medium (direct message via Twitter for example). Could be done using long polling (Tornado, node.js?) for sending updates to clients.
+
+Version 1.1
+===========
+
+Installation
+=================
+
+URLs Design
+=================
+
+We need to blacklist certain usernames to avoid conflicts, e.g., questions, add, category. 
+See: http://www.quora.com/How-do-sites-prevent-vanity-URLs-from-colliding-with-future-features
+
+Home:                   / 
+Latest questions:       /questions
+Add question:           /add
+User profile:           /john-doe (lists latest questions and answers by user, like in Quora)
+User questions:         /john-doe/questions
+User answers:           /john-doe/answers
+A question:             /how-to-play-chess
+Edit question:          /how-to-play-chess/edit (version for javascript disabled, edit inline otherwise)
+Answer question:        /how-to-play-chess/answer (version for javascript disabled, answer inline otherwise)
+Delete question:        /how-to-play-chess/delete (version for javascript disabled, delete inline otherwise)
+Questions per category: /category/python-development

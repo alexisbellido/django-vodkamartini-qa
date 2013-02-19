@@ -1,0 +1,13 @@
+{% extends "vodkamartiniqa/base_questions.html" %}
+
+{% block title %}{{ block.super }} | The Top Questioners{% endblock %}
+
+{% block content %}
+
+<h1>Top Questioners</h1>
+{% for user in users %}
+    <h2>{{ user.username }}</h2>
+    <p>How many questions? {{ user.num_questions }}</p>
+{% endfor %}
+
+{% endblock %}

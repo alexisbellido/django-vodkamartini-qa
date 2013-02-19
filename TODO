@@ -1,0 +1,19 @@
+TODO
+
+- Management commands to assign users to questions and answers and change categories for questions.
+** keep adding tests as I go **
+link for edit question for user who published and for admin
+** keep adding tests as I go **
+view for publishing question
+** keep adding tests as I go **
+view for answering question
+vote for answer (ajax?, time to read Django and Ajax book?)
+vote for question (ajax?)
+should I use memcached or go directly to redis for my cache?
+enable cache and put sessions in cache (memcached to start), read https://docs.djangoproject.com/en/dev/topics/http/sessions/?from=olddocs/
+use redis for sessions and something else?
+
+-----
+
+Long polling: http://www.quora.com/How-do-you-push-messages-back-to-a-web-browser-client-through-AJAX-Is-there-any-way-to-do-this-without-having-the-client-constantly-polling-the-server-for-updates
+

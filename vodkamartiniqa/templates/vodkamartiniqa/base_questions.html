@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Questions and Answers{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}vodkamartiniqa/css/main.css"/>
+{% endblock %}
+
+{% block head_rss %}
+    {% load url from future %}
+    {% comment %}
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="{% url 'vodkamartiniqa_feed_latest' %}">
+    {% endcomment %}
+{% endblock head_rss %}
+
+{% block bodyclass %}questions{% endblock %}
+
+{% block primary_menu %}
+    {% load url from future %}
+    <p><a href="{% url 'vodkamartiniqa_question_search' %}">search question</a></p>
+    <p><a href="{% url 'vodkamartiniqa_question_add' %}">add question</a></p>
+    <p><a href="{% url 'vodkamartiniqa_questions_home' %}">all questions</a></p>
+    {% load vm_auth %}
+    {% login_info request user %}
+{% endblock primary_menu %}
+
+{% block sidebar %}
+{% comment %}
+    <aside>
+    {% load question_tags %}
+
+    <h2>Latest Questions</h2>
+    {% get_questions latest 3 as latest_questions %}
+    {% for object in latest_questions %}
+        <li><a href="{{ object.get_absolute_url }}">{{ object.title }}</a></li>
+    {% endfor %}
+
+    <h2>Most Voted Questions</h2>
+    {% get_questions voted 3 as voted_questions %}
+    {% for object in voted_questions %}
+        <li><a href="{{ object.get_absolute_url }}">{{ object.title }}</a> (votes up: {{ object.votes_up }} | votes down: {{ object.votes_down }})</li>
+    {% endfor %}
+
+    <h2>Questions With More Answers Including Some by Experts</h2>
+    {% get_questions answered_expert 3 as answered_expert_questions %}
+    {% for object in answered_expert_questions %}
+        <li><a href="{{ object.get_absolute_url }}">{{ object.title }}</a> (answers: {{ object.num_answers }})</li>
+    {% endfor %}
+
+    <h2>Questions With More Answers</h2>
+    {% get_questions answered 3 as answered_questions %}
+    {% for object in answered_questions %}
+        <li><a href="{% url 'vodkamartiniqa_question_detail' slug=object.slug %}">{{ object.title }}</a> (answers: {{ object.num_answers }})</li>
+    {% endfor %}
+
+    </aside>
+{% endcomment %}
+
+{% endblock sidebar %}
+
+{% block footer_javascript_section %}
+    <script src="{{ STATIC_URL }}vodkamartiniqa/js/main.js"></script>
+{% endblock footer_javascript_section %}

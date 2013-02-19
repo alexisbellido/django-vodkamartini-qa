@@ -1,0 +1,15 @@
+{% extends "vodkamartiniqa/base_questions.html" %}
+
+{% block title %}Search Form{% endblock %}
+
+{% block content %}
+{% load url from future %}
+  <h2>Search Form</h2>
+  {% if error %}
+    <p><strong>Please submit a search term.</strong></p>
+  {% endif %}
+  <form action="{% url 'vodkamartiniqa_question_search' %}" method="get">
+    <input type="text" name="q" />
+    <input type="submit" value="Search" />
+  </form>
+{% endblock %}
