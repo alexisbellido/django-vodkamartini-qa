@@ -97,8 +97,7 @@ def questions_index(request, page=1):
 
     return render_to_response('vodkamartiniqa/question_list.html',
                               {
-                                #'object_list': questions_list,
-                                'object_list': [],
+                                'object_list': questions_list,
                                 'experts_object_list': experts_questions_list,
                                 'form': form,
                                 'next': redirect_to,
