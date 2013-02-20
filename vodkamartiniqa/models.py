@@ -148,7 +148,23 @@ def moderate_question(sender, question, request, **kwargs):
     Test Akismet spam with 'viagra-test-123'
     """
     if not question.id:
-        pass
+        akismet_api = Akismet(key=settings.AKISMET_API_KEY, blog_url="http://%s/" % Site.objects.get_current().domain)
+        if akismet_api.verify_key():
+            akismet_data = {
+                    'comment_type' : 'comment', # this needs to be always 'comment'
+                    'referrer': request.META['HTTP_REFERER'],
+                    'user_ip': get_client_ip(request),
+                    'user_agent': request.META['HTTP_USER_AGENT'],
+                   }
+            try:
+                if akismet_api.comment_check(smart_str(question.body), akismet_data, build_data=True) or check_internal_spam_words(question.body):
+                    question.status = Question.HIDDEN_STATUS
+                    messages.info(request, 'Your question was marked as spam.')
+                else:
+                    messages.info(request, 'Your question has been published.')
+            except AkismetError:
+                """ This exception can be raised when Akismet is down or some parameter in the call is missing. See akismet.py """
+                pass
 
 answer_will_be_posted.connect(moderate_answer, sender=Answer)
 pre_delete.connect(delete_answer, sender=Answer)

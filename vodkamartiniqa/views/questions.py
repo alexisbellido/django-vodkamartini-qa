@@ -65,7 +65,6 @@ def questions_index(request, page=1):
             if form.is_valid():
                 question = form.save()
                 #import pdb; pdb.set_trace()
-                messages.add_message(request, messages.INFO, 'Your question has been published.')
                 return HttpResponseRedirect(question.get_absolute_url())
         else:
             form = QuestionForm(author=request.user, request=request)
@@ -166,7 +165,6 @@ def question_add(request):
         if form.is_valid():
             question = form.save()
             #import pdb; pdb.set_trace()
-            messages.add_message(request, messages.INFO, 'Your question has been published.')
             return HttpResponseRedirect(question.get_absolute_url())
     else:
         form = QuestionForm(author=request.user, request=request)

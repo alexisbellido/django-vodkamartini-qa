@@ -160,30 +160,33 @@ class QuestionForm(forms.Form):
     #categories = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Category.objects.all(), required=False)
 
     def save(self):
-        # Signal that the question is about to be saved
-        #signals.question_will_be_posted.send(
-        #    sender  = answer.__class__,
-        #    answer = answer,
-        #    request = request
-        #)
-
         # TODO what to do about status?
         if self.question_id:
             """ existing question, no need to change author or status """
             question = Question.objects.get(pk=self.question_id)
             question.title = self.cleaned_data['title']
             question.body = self.cleaned_data['body']
-            question.save()
+        else:
+            question = Question(title=self.cleaned_data['title'], body=self.cleaned_data['body'], author=self.author, status=Question.LIVE_STATUS)
+
+        # Signal that the question is about to be saved
+        signals.question_will_be_posted.send(
+            sender  = question.__class__,
+            question = question,
+            request = self.request,
+        )
+
+        question.save()
+        if self.question_id:
             if self.cleaned_data['category']:
                 question.categories.clear()
                 question.categories.add(self.cleaned_data['category'])
         else:
-            question = Question(title=self.cleaned_data['title'], body=self.cleaned_data['body'], author=self.author, status=Question.LIVE_STATUS)
-            question.save()
             if self.cleaned_data['category']:
                 question.categories.add(self.cleaned_data['category'])
             # use this for multiple categories, probably with checkboxes
             #categories = self.cleaned_data['categories']
             #for category in categories:
             #    question.categories.add(category)
+
         return question
