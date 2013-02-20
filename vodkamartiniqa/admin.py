@@ -18,10 +18,10 @@ class DrupalQuestionNodeInline(admin.TabularInline):
         return False
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_filter = ['created']
+    list_filter = ['created', 'status']
     search_fields = ['title']
     prepopulated_fields = {"slug": ("title", )}
-    list_display = ('__unicode__', 'author', 'created')
+    list_display = ('__unicode__', 'author', 'created', 'status')
     # too expensive because each answer is displaying all users
     #inlines = [AnswersInline]
     exclude = ('voted_up_by', 'voted_down_by')
