@@ -8,6 +8,7 @@ from vodkamartinicategory.models import Category
 from django.utils import timezone
 from django.utils.translation import ungettext
 from django.utils.text import get_text_list
+from vodkamartiniqa import signals
 
 ANSWER_MAX_LENGTH = getattr(settings,'ANSWER_MAX_LENGTH',3000)
 
@@ -145,10 +146,11 @@ class AnswerForm(AnswerSecurityForm):
         return value
 
 class QuestionForm(forms.Form):
-    def __init__(self, author, question_id=0, *args, **kwargs):
+    def __init__(self, author, question_id=0, request=None, *args, **kwargs):
         super(QuestionForm, self).__init__(*args, **kwargs)
         self.author = author
         self.question_id = question_id
+        self.request = request
 
     title = forms.CharField()
     body = forms.CharField(widget=forms.Textarea, label='Enter your question')
@@ -158,6 +160,13 @@ class QuestionForm(forms.Form):
     #categories = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Category.objects.all(), required=False)
 
     def save(self):
+        # Signal that the question is about to be saved
+        #signals.question_will_be_posted.send(
+        #    sender  = answer.__class__,
+        #    answer = answer,
+        #    request = request
+        #)
+
         # TODO what to do about status?
         if self.question_id:
             """ existing question, no need to change author or status """

@@ -2,17 +2,19 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from vodkamartiniarticle.models import BaseArticle
+from vodkamartiniarticle.helper import check_internal_spam_words
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from vodkamartiniqa.signals import answer_will_be_posted
+from vodkamartiniqa.signals import answer_will_be_posted, question_will_be_posted
 from django.db.models.signals import pre_delete
 from django.contrib.sites.models import Site
 from akismet import Akismet
 from akismet import AkismetError
 from django.utils.encoding import smart_str
 from django.contrib import messages
+from vodkamartiniarticle.helper import get_client_ip
 
 ANSWER_MAX_LENGTH = getattr(settings,'ANSWER_MAX_LENGTH',3000)
 
@@ -117,9 +119,9 @@ def moderate_answer(sender, answer, request, **kwargs):
                     'user_agent': request.META['HTTP_USER_AGENT'],
                    }
             try:
-                if akismet_api.comment_check(smart_str(answer.answer), akismet_data, build_data=True):
+                if akismet_api.comment_check(smart_str(answer.answer), akismet_data, build_data=True) or check_internal_spam_words(answer.answer):
                     answer.is_public = False
-                    messages.info(request, 'Your answer was marked as spam..')
+                    messages.info(request, 'Your answer was marked as spam.')
                 else:
                     messages.info(request, 'Your answer has been published.')
             except AkismetError:
@@ -141,5 +143,13 @@ def delete_answer(sender, instance, **kwargs):
             question.has_expert_answer = False
             question.save()
 
+def moderate_question(sender, question, request, **kwargs):
+    """
+    Test Akismet spam with 'viagra-test-123'
+    """
+    if not question.id:
+        pass
+
 answer_will_be_posted.connect(moderate_answer, sender=Answer)
 pre_delete.connect(delete_answer, sender=Answer)
+question_will_be_posted.connect(moderate_question, sender=Question)

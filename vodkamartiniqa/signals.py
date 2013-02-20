@@ -15,6 +15,8 @@ answer_will_be_posted = Signal(providing_args=["answer", "request"])
 # from the Answer object's post-save signal.
 answer_was_posted = Signal(providing_args=["answer", "request"])
 
+question_will_be_posted = Signal(providing_args=["question", "request"])
+
 # TODO, see django.contrib.comments
 # Sent after a comment was "flagged" in some way. Check the flag to see if this
 # was a user requesting removal of a comment, a moderator approving/removing a

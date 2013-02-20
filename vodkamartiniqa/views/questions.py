@@ -8,6 +8,7 @@ from vodkamartiniqa.models import Question
 from vodkamartiniqa import signals
 from vodkamartiniqa.forms import QuestionForm, AnswerForm
 from vodkamartiniqa.views.helpers import get_questions
+from vodkamartiniarticle.helper import get_client_ip
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from vodkamartiniauth.forms import LoginForm
 import urlparse
@@ -60,14 +61,14 @@ def questions_index(request, page=1):
     redirect_to = request.REQUEST.get('next', '')
     if request.user.is_authenticated():
         if request.method == 'POST':
-            form = QuestionForm(author=request.user, data=request.POST)
+            form = QuestionForm(author=request.user, data=request.POST, request=request)
             if form.is_valid():
                 question = form.save()
                 #import pdb; pdb.set_trace()
                 messages.add_message(request, messages.INFO, 'Your question has been published.')
                 return HttpResponseRedirect(question.get_absolute_url())
         else:
-            form = QuestionForm(author=request.user)
+            form = QuestionForm(author=request.user, request=request)
     else:
         if request.method == "POST":
             form = LoginForm(data=request.POST)
@@ -161,14 +162,14 @@ def question_add(request):
     """
     #logging.debug(request.user)
     if request.method == 'POST':
-        form = QuestionForm(author=request.user, data=request.POST)
+        form = QuestionForm(author=request.user, data=request.POST, request=request)
         if form.is_valid():
             question = form.save()
             #import pdb; pdb.set_trace()
             messages.add_message(request, messages.INFO, 'Your question has been published.')
             return HttpResponseRedirect(question.get_absolute_url())
     else:
-        form = QuestionForm(author=request.user)
+        form = QuestionForm(author=request.user, request=request)
     return render_to_response('vodkamartiniqa/question_form.html',
                               {
                                'form': form,
@@ -185,7 +186,7 @@ def question_edit(request, pk):
         return HttpResponseRedirect(object.get_absolute_url())
 
     if request.method == 'POST':
-        form = QuestionForm(author=request.user, question_id=object.id, data=request.POST)
+        form = QuestionForm(author=request.user, question_id=object.id, data=request.POST, request=request)
         if form.is_valid():
             object = form.save()
             messages.info(request, 'Your question has been updated.')
@@ -195,7 +196,7 @@ def question_edit(request, pk):
         categories = object.categories.all()
         if categories:
             data['category'] = categories.all()[0]
-        form = QuestionForm(author=request.user, question_id=object.id, data=data)
+        form = QuestionForm(author=request.user, question_id=object.id, data=data, request=request)
 
     return render_to_response('vodkamartiniqa/question_form.html',
                               {
