@@ -157,7 +157,7 @@ def moderate_question(sender, question, request, **kwargs):
                     'user_agent': request.META['HTTP_USER_AGENT'],
                    }
             try:
-                if akismet_api.comment_check(smart_str(question.body), akismet_data, build_data=True) or check_internal_spam_words(question.body):
+                if akismet_api.comment_check(smart_str(question.body), akismet_data, build_data=True) or check_internal_spam_words(question.body) or akismet_api.comment_check(smart_str(question.title), akismet_data, build_data=True) or check_internal_spam_words(question.title):
                     question.status = Question.HIDDEN_STATUS
                     messages.info(request, 'Your question was marked as spam.')
                 else:
