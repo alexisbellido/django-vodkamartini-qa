@@ -1,21 +1,11 @@
+import json
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.utils.html import strip_tags
 from vodkamartiniqa.models import Question
 
-"""
-TODO check views module and test all views, including the ajax/json stuff, compare with URLConf to see what's
-being used.
-
-normal views
-def question_detail(request, slug):
-def category(request, category):
-
-ajax views
-def get_questions_ajax(request, with_experts_answers='regular', type='latest', start=0, end=8):
-def question_latest_questions(request, num=4):
-"""
 
 class MainViews(TestCase):
     def setUp(self):
@@ -88,9 +78,26 @@ class MainViews(TestCase):
         self.assertEqual(response.context['questions'].count(), 0)
 
     def testQuestionDetail(self):
-        """ Question details page """
-        one = 1
-        self.assertEqual(one, 1),
+        """
+        Question details page.
+        """
+        pass
+
+    def testQuestionCategory(self):
+        """
+        Category page listing all questions in that category.
+        """
+        pass
 
 class JSONViews(TestCase):
-    pass
+    def testGetQuestionsAjax(self):
+        """
+        """
+        #def get_questions_ajax(request, with_experts_answers='regular', type='latest', start=0, end=8):
+        pass
+
+    def testLatestQuestions(self):
+        """
+        """
+        #def question_latest_questions(request, num=4):
+        pass
