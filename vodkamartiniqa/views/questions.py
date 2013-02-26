@@ -1,4 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponsePermanentRedirect
+from django.contrib.auth.models import User
 from django.db.models import F
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -410,8 +411,13 @@ def post_answer(request, next=None, using=None):
     return HttpResponseRedirect(reverse('vodkamartiniqa_question_detail', kwargs={'slug': question.slug}))
 
 
-def question_latest_questions(request, num=4):
-    questions = Question.live.all().order_by('-created')[:num]
+def question_latest_questions(request, start=0, end=4, username=None):
+    if username:
+        user = User.objects.filter(username=username)
+        questions = Question.live.filter(author=user)
+    else:
+        questions = Question.live.all()
+    questions = questions.order_by('-created')[start:end]
     to_json = []
     for question in questions:
         to_json.append({'title': strip_tags(question.title), 'url': question.get_absolute_url()})

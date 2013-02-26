@@ -11,6 +11,7 @@ class MainViews(TestCase):
     def setUp(self):
         """
         Create one question marked as normal and one question marked as answered by expert.
+        Notice the normal question has "Keyword" in the title, which is used for testing the basic search view.
         django.test.client.Client gets confused with templates when using the cache, that's why we need to clear it.
         """
         cache.clear()

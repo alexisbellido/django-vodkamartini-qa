@@ -14,6 +14,7 @@ urlpatterns += patterns('vodkamartiniqa.views.questions',
     url(r'^get-questions/(?P<with_experts_answers>(experts|regular))/(?P<type>(latest|voted|answered))/(?P<start>\d+)/(?P<end>\d+)/$', 'get_questions_ajax', name='vodkamartiniqa_questions_get_ajax'),
 
     url(r'^latest/$', 'question_latest_questions', name='vodkamartiniqa_question_latest_questions'),
+    url(r'^latest/(?P<username>[-\w]+)/(?P<start>\d+)/(?P<end>\d+)/$', 'question_latest_questions', name='vodkamartiniqa_question_latest_questions'),
     url(r'^page-(?P<page>\d+)/$', 'questions_index', name='vodkamartiniqa_questions_index'),
     url(r'^ask/$', 'question_add', name='vodkamartiniqa_question_add'),
     url(r'^edit/question/(?P<pk>\d+)/$', 'question_edit', name='vodkamartiniqa_question_edit'),
