@@ -1,5 +1,15 @@
 TODO
 
+tests:
+- login as user to publish question
+- error if non logged in user tries to publish question
+- create user who is expert and answer a question, that question should be marked as has answer by expert
+- create normal user who answers question and that question should be marked a has *no* answer by expert
+- check publishing answers and questions that trigger spam filters and that don't trigger spam filters
+- voting up and down, and check only logged in users can do it
+
+- document using RST, see scoops book
+
 - Management commands to assign users to questions and answers and change categories for questions.
 ** keep adding tests as I go **
 link for edit question for user who published and for admin
