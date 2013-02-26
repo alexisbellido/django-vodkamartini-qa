@@ -9,8 +9,6 @@ TODO check views module and test all views, including the ajax/json stuff, compa
 being used.
 
 normal views
-def question_thanks(request, pk):
-def question_search(request):
 def question_detail(request, slug):
 def category(request, category):
 
@@ -27,7 +25,7 @@ class MainViews(TestCase):
         """
         cache.clear()
         author = User.objects.create_user(username='joe', password='qwerty')
-        self.normal_title='Normal Question'
+        self.normal_title='Normal Question With Keyword In Title'
         self.expert_title='Question With Expert Answer'
 
         self.question = Question(
@@ -63,6 +61,31 @@ class MainViews(TestCase):
         self.assertEqual(response.context['experts_object_list'].count(), 1)
         self.assertEqual(response.context['object_list'][0].title, self.normal_title)
         self.assertEqual(response.context['object_list'].count(), 1)
+
+    def testQuestionSearch(self):
+        """
+        Visit search page and get just the search form.
+        """
+        response = self.client.get(reverse('vodkamartiniqa_question_search'))
+        self.assertTemplateUsed(response, 'vodkamartiniqa/search_form.html')
+
+    def testQuestionSearchResults(self):
+        """
+        Search results page with one result.
+        """
+        data = {'q': 'keyword'}
+        response = self.client.get(reverse('vodkamartiniqa_question_search'), data)
+        self.assertTemplateUsed(response, 'vodkamartiniqa/search_results.html')
+        self.assertEqual(response.context['questions'][0].title, self.normal_title)
+
+    def testQuestionSearchNoResults(self):
+        """
+        Search results page with no results.
+        """
+        data = {'q': 'noresultsforthis'}
+        response = self.client.get(reverse('vodkamartiniqa_question_search'), data)
+        self.assertTemplateUsed(response, 'vodkamartiniqa/search_results.html')
+        self.assertEqual(response.context['questions'].count(), 0)
 
     def testQuestionDetail(self):
         """ Question details page """

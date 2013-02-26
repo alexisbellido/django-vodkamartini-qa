@@ -203,14 +203,14 @@ def question_edit(request, pk):
                               },
                               RequestContext(request))
 
-def question_thanks(request, pk):
-    question = get_object_or_404(Question, pk=pk)
-    return render_to_response('vodkamartiniqa/question_thanks.html',
-                              {
-                               'question': question,
-                              },
-                              RequestContext(request)
-                              )
+#def question_thanks(request, pk):
+#    question = get_object_or_404(Question, pk=pk)
+#    return render_to_response('vodkamartiniqa/question_thanks.html',
+#                              {
+#                               'question': question,
+#                              },
+#                              RequestContext(request)
+#                              )
 
 def question_search(request):
     error = False
