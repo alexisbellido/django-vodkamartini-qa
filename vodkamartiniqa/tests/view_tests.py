@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils.html import strip_tags
-from vodkamartiniqa.models import Question, expert_groups
+from vodkamartiniqa.models import Question, Answer, expert_groups
 
 
 class MainViews(TestCase):
@@ -170,7 +170,36 @@ class JSONViews(TestCase):
                         {'question_id': 21, 'regular_answers': 2, 'expert_answers': 1},
                       ]
 
+        for answer_detail in answers_map:
+            print answer_detail
+            #answer = Answer(
+            #                title=title,
+            #                body=body,
+            #                author=author, 
+            #                status=Question.LIVE_STATUS,
+            #               )
+            #answer.save()
+
         #print self.questions[0], self.questions[0].id
+        # create answers
+        #answer = models.TextField(max_length=ANSWER_MAX_LENGTH)
+        #user = models.ForeignKey(User) # user who published this answer
+        #question = models.ForeignKey(Question)
+        #votes_up = models.IntegerField(default=0)
+        #voted_up_by = models.ManyToManyField(User, blank=True, related_name='answers_voted_up') # Users who voted up this answer
+        #votes_down = models.IntegerField(default=0)
+        #voted_down_by = models.ManyToManyField(User, blank=True, related_name='answers_voted_down') # Users who voted down this answer
+
+        ## Metadata about the answer
+        #submit_date = models.DateTimeField('date/time submitted', default=None)
+        #ip_address  = models.IPAddressField('IP address', blank=True, null=True)
+        #is_public   = models.BooleanField(default=True,
+        #                                  help_text='Uncheck this box to make the answer effectively disappear from the site.')
+        #is_removed  = models.BooleanField(default=False,
+        #                                  help_text='Check this box if the answer is inappropriate. ' \
+        #                                  'A "This answer has been removed" message will be displayed instead.')
+        #posted_by_expert   = models.BooleanField(default=False,
+        #                                  help_text='Check this box if this an answer by an expert.')
 
     def testHomeLatestExpertsQuestionsAjax(self):
         """
