@@ -140,8 +140,8 @@ class JSONViews(TestCase):
 
         number_questions = 24
         for i in range(0, number_questions):
-            title='Question #%d' % (i+1, )
-            body='This is question #%d.' % (i+1, )
+            title='Question #%d' % (i, )
+            body='This is question #%d.' % (i, )
             author=self.regular_user 
             question = Question(
                                 title=title,
@@ -152,62 +152,44 @@ class JSONViews(TestCase):
             question.save()
             self.questions.append(question)
 
-        print "==="
-        print " start answering "
-        print "==="
-        # choose a few questions and publish answers here and there, some with answers from experts, others from regular and others mixed
-        # follow the answers_map below
         answers_map = [ 
-                        {'question_id': 0, 'regular_answers': 0, 'expert_answers': 0},
-                        {'question_id': 3, 'regular_answers': 2, 'expert_answers': 0},
-                        {'question_id': 4, 'regular_answers': 1, 'expert_answers': 2},
-                        {'question_id': 6, 'regular_answers': 0, 'expert_answers': 5},
-                        {'question_id': 7, 'regular_answers': 3, 'expert_answers': 3},
-                        {'question_id': 9, 'regular_answers': 0, 'expert_answers': 8},
-                        {'question_id': 13, 'regular_answers': 5, 'expert_answers': 2},
-                        {'question_id': 15, 'regular_answers': 1, 'expert_answers': 1},
-                        {'question_id': 19, 'regular_answers': 0, 'expert_answers': 3},
-                        {'question_id': 21, 'regular_answers': 2, 'expert_answers': 1},
+                        {'question_id': 0, 'regular_answers': 0, 'expert_answers': 0, 'votes_up': 1, 'votes_down': 3},
+                        {'question_id': 3, 'regular_answers': 2, 'expert_answers': 0, 'votes_up': 8, 'votes_down': 1},
+                        {'question_id': 4, 'regular_answers': 1, 'expert_answers': 2, 'votes_up': 3, 'votes_down': 3},
+                        {'question_id': 6, 'regular_answers': 0, 'expert_answers': 5, 'votes_up': 1, 'votes_down': 1},
+                        {'question_id': 7, 'regular_answers': 3, 'expert_answers': 3, 'votes_up': 8, 'votes_down': 3},
+                        {'question_id': 9, 'regular_answers': 0, 'expert_answers': 8, 'votes_up': 3, 'votes_down': 1},
+                        {'question_id': 11, 'regular_answers': 2, 'expert_answers': 1, 'votes_up': 2, 'votes_down': 1},
+                        {'question_id': 2, 'regular_answers': 3, 'expert_answers': 2, 'votes_up': 7, 'votes_down': 1},
+                        {'question_id': 13, 'regular_answers': 5, 'expert_answers': 2, 'votes_up': 3, 'votes_down': 3},
+                        {'question_id': 15, 'regular_answers': 1, 'expert_answers': 1, 'votes_up': 10, 'votes_down': 1},
+                        {'question_id': 19, 'regular_answers': 0, 'expert_answers': 3, 'votes_up': 5, 'votes_down': 3},
+                        {'question_id': 21, 'regular_answers': 2, 'expert_answers': 1, 'votes_up': 4, 'votes_down': 2},
                       ]
 
-        for answer_detail in answers_map:
-            print answer_detail
-            #answer = Answer(
-            #                title=title,
-            #                body=body,
-            #                author=author, 
-            #                status=Question.LIVE_STATUS,
-            #               )
-            #answer.save()
-
-        #print self.questions[0], self.questions[0].id
-        # create answers
-        #answer = models.TextField(max_length=ANSWER_MAX_LENGTH)
-        #user = models.ForeignKey(User) # user who published this answer
-        #question = models.ForeignKey(Question)
-        #votes_up = models.IntegerField(default=0)
-        #voted_up_by = models.ManyToManyField(User, blank=True, related_name='answers_voted_up') # Users who voted up this answer
-        #votes_down = models.IntegerField(default=0)
-        #voted_down_by = models.ManyToManyField(User, blank=True, related_name='answers_voted_down') # Users who voted down this answer
-
-        ## Metadata about the answer
-        #submit_date = models.DateTimeField('date/time submitted', default=None)
-        #ip_address  = models.IPAddressField('IP address', blank=True, null=True)
-        #is_public   = models.BooleanField(default=True,
-        #                                  help_text='Uncheck this box to make the answer effectively disappear from the site.')
-        #is_removed  = models.BooleanField(default=False,
-        #                                  help_text='Check this box if the answer is inappropriate. ' \
-        #                                  'A "This answer has been removed" message will be displayed instead.')
-        #posted_by_expert   = models.BooleanField(default=False,
-        #                                  help_text='Check this box if this an answer by an expert.')
+        for item in answers_map:
+            self.questions[item['question_id']].votes_up = item['votes_up']
+            self.questions[item['question_id']].votes_down = item['votes_down']
+            self.questions[item['question_id']].save()
+            for i in range(0, item['regular_answers']):
+                answer = Answer(
+                                answer='Regular answer %d for question %d' % (i, item['question_id']),
+                                user=self.regular_user,
+                                question=self.questions[item['question_id']],
+                               )
+                answer.save()
+            for i in range(0, item['expert_answers']):
+                answer = Answer(
+                                answer='Expert answer %d for question %d' % (i, item['question_id']),
+                                user=self.expert_user,
+                                question=self.questions[item['question_id']],
+                               )
+                answer.save()
 
     def testHomeLatestExpertsQuestionsAjax(self):
         """
-        http://armitage.yourtango.com:8006/questions/get-questions/experts/latest/0/9/
+        Get latest questions with at least one answer by an expert.
         """
-        #url(r'^get-questions/(?P<with_experts_answers>(experts|regular))/(?P<type>(latest|voted|answered))/(?P<start>\d+)/(?P<end>\d+)/$', 'get_questions_ajax', name='vodkamartiniqa_questions_get_ajax'),
-        #def get_questions_ajax(request, with_experts_answers='regular', type='latest', start=0, end=8):
-        slug = 'normal-question-with-keyword-in-title'
         data = {
                 'with_experts_answers': 'experts',
                 'type': 'latest',
@@ -216,27 +198,73 @@ class JSONViews(TestCase):
                }
         response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
         self.assertEqual(response.status_code, 200)
-        print response.content
-        #self.assertTemplateUsed(response, 'vodkamartiniqa/question_detail.html')
-        #self.assertEqual(response.context['object'].title, self.normal_title)
-        #self.assertEqual(response.context['object'].slug, slug)
+
+        # TODO test that json results are in correct order
+        parsed_data = json.loads(response.content)
+        self.assertEqual(len(parsed_data), data['end'] - data['start'])
+        for element in parsed_data:
+            self.assertEqual(element['title'], self.questions[element['id']-1].title)
 
     def testHomeMostAnsweredExpertsQuestionsAjax(self):
         """
+        Get most answered questions with at least one answer by an expert.
         http://armitage.yourtango.com:8006/questions/get-questions/experts/answered/0/9/
         """
-        #def get_questions_ajax(request, with_experts_answers='regular', type='latest', start=0, end=8):
+        data = {
+                'with_experts_answers': 'experts',
+                'type': 'answered',
+                'start': 0,
+                'end': 9,
+               }
+        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
+        self.assertEqual(response.status_code, 200)
+
+        # TODO test that json results are in correct order
+        parsed_data = json.loads(response.content)
+        self.assertEqual(len(parsed_data), data['end'] - data['start'])
+        for element in parsed_data:
+            self.assertEqual(element['title'], self.questions[element['id']-1].title)
+
+    def testHomeMostVotedExpertsQuestionsAjax(self):
+        """
+        Get most voted questions with at least one answer by an expert.
+        http://armitage.yourtango.com:8006/questions/get-questions/experts/voted/0/9/
+        """
+        data = {
+                'with_experts_answers': 'experts',
+                'type': 'voted',
+                'start': 0,
+                'end': 9,
+               }
+        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
+        self.assertEqual(response.status_code, 200)
+
+        # TODO test that json results are in correct order
+        parsed_data = json.loads(response.content)
+        self.assertEqual(len(parsed_data), data['end'] - data['start'])
+        for element in parsed_data:
+            self.assertEqual(element['title'], self.questions[element['id']-1].title)
+
+    def testHomeLatestQuestionsAjax(self):
+        """
+        Get latest questions with answers by only regular users.
+        """
+        pass
+
+    def testHomeMostAnsweredQuestionsAjax(self):
+        """
+        Get latest questions with answers by only regular users.
+        """
         pass
 
     def testHomeMostVotedQuestionsAjax(self):
         """
-        http://armitage.yourtango.com:8006/questions/get-questions/experts/voted/0/9/
+        Get latest questions with answers by only regular users.
         """
-        #def get_questions_ajax(request, with_experts_answers='regular', type='latest', start=0, end=8):
         pass
 
     def testLatestQuestions(self):
         """
+        Get latest questions.
         """
-        #def question_latest_questions(request, num=4):
         pass
