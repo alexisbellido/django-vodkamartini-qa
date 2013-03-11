@@ -123,148 +123,148 @@ class MainViews(TestCase):
         """
         pass
 
-class JSONViews(TestCase):
-    def setUp(self):
-        """
-        Create a normal user and an expert user, then 
-        create a few questions and answers, some of the answers published by experts.
-        django.test.client.Client gets confused with templates when using the cache, that's why we need to clear it.
-        """
-        cache.clear()
-
-        self.regular_user = User.objects.create_user(username='bill_normal', password='secret')
-        self.group_expert = Group.objects.create(name=expert_groups[0])
-        self.expert_user = User.objects.create_user(username='joe_expert', password='secret')
-        self.expert_user.groups.add(self.group_expert)
-        self.questions = []
-
-        number_questions = 24
-        for i in range(0, number_questions):
-            title='Question #%d' % (i, )
-            body='This is question #%d.' % (i, )
-            author=self.regular_user 
-            question = Question(
-                                title=title,
-                                body=body,
-                                author=author, 
-                                status=Question.LIVE_STATUS,
-                               )
-            question.save()
-            self.questions.append(question)
-
-        answers_map = [ 
-                        {'question_id': 0, 'regular_answers': 0, 'expert_answers': 0, 'votes_up': 1, 'votes_down': 3},
-                        {'question_id': 3, 'regular_answers': 2, 'expert_answers': 0, 'votes_up': 8, 'votes_down': 1},
-                        {'question_id': 4, 'regular_answers': 1, 'expert_answers': 2, 'votes_up': 3, 'votes_down': 3},
-                        {'question_id': 6, 'regular_answers': 0, 'expert_answers': 5, 'votes_up': 1, 'votes_down': 1},
-                        {'question_id': 7, 'regular_answers': 3, 'expert_answers': 3, 'votes_up': 8, 'votes_down': 3},
-                        {'question_id': 9, 'regular_answers': 0, 'expert_answers': 8, 'votes_up': 3, 'votes_down': 1},
-                        {'question_id': 11, 'regular_answers': 2, 'expert_answers': 1, 'votes_up': 2, 'votes_down': 1},
-                        {'question_id': 2, 'regular_answers': 3, 'expert_answers': 2, 'votes_up': 7, 'votes_down': 1},
-                        {'question_id': 13, 'regular_answers': 5, 'expert_answers': 2, 'votes_up': 3, 'votes_down': 3},
-                        {'question_id': 15, 'regular_answers': 1, 'expert_answers': 1, 'votes_up': 10, 'votes_down': 1},
-                        {'question_id': 19, 'regular_answers': 0, 'expert_answers': 3, 'votes_up': 5, 'votes_down': 3},
-                        {'question_id': 21, 'regular_answers': 2, 'expert_answers': 1, 'votes_up': 4, 'votes_down': 2},
-                      ]
-
-        for item in answers_map:
-            self.questions[item['question_id']].votes_up = item['votes_up']
-            self.questions[item['question_id']].votes_down = item['votes_down']
-            self.questions[item['question_id']].save()
-            for i in range(0, item['regular_answers']):
-                answer = Answer(
-                                answer='Regular answer %d for question %d' % (i, item['question_id']),
-                                user=self.regular_user,
-                                question=self.questions[item['question_id']],
-                               )
-                answer.save()
-            for i in range(0, item['expert_answers']):
-                answer = Answer(
-                                answer='Expert answer %d for question %d' % (i, item['question_id']),
-                                user=self.expert_user,
-                                question=self.questions[item['question_id']],
-                               )
-                answer.save()
-
-    def testHomeLatestExpertsQuestionsAjax(self):
-        """
-        Get latest questions with at least one answer by an expert.
-        """
-        data = {
-                'with_experts_answers': 'experts',
-                'type': 'latest',
-                'start': 0,
-                'end': 9,
-               }
-        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
-        self.assertEqual(response.status_code, 200)
-
-        # TODO test that json results are in correct order
-        parsed_data = json.loads(response.content)
-        self.assertEqual(len(parsed_data), data['end'] - data['start'])
-        for element in parsed_data:
-            self.assertEqual(element['title'], self.questions[element['id']-1].title)
-
-    def testHomeMostAnsweredExpertsQuestionsAjax(self):
-        """
-        Get most answered questions with at least one answer by an expert.
-        http://armitage.yourtango.com:8006/questions/get-questions/experts/answered/0/9/
-        """
-        data = {
-                'with_experts_answers': 'experts',
-                'type': 'answered',
-                'start': 0,
-                'end': 9,
-               }
-        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
-        self.assertEqual(response.status_code, 200)
-
-        # TODO test that json results are in correct order
-        parsed_data = json.loads(response.content)
-        self.assertEqual(len(parsed_data), data['end'] - data['start'])
-        for element in parsed_data:
-            self.assertEqual(element['title'], self.questions[element['id']-1].title)
-
-    def testHomeMostVotedExpertsQuestionsAjax(self):
-        """
-        Get most voted questions with at least one answer by an expert.
-        http://armitage.yourtango.com:8006/questions/get-questions/experts/voted/0/9/
-        """
-        data = {
-                'with_experts_answers': 'experts',
-                'type': 'voted',
-                'start': 0,
-                'end': 9,
-               }
-        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
-        self.assertEqual(response.status_code, 200)
-
-        # TODO test that json results are in correct order
-        parsed_data = json.loads(response.content)
-        self.assertEqual(len(parsed_data), data['end'] - data['start'])
-        for element in parsed_data:
-            self.assertEqual(element['title'], self.questions[element['id']-1].title)
-
-    def testHomeLatestQuestionsAjax(self):
-        """
-        Get latest questions with answers by only regular users.
-        """
-        pass
-
-    def testHomeMostAnsweredQuestionsAjax(self):
-        """
-        Get latest questions with answers by only regular users.
-        """
-        pass
-
-    def testHomeMostVotedQuestionsAjax(self):
-        """
-        Get latest questions with answers by only regular users.
-        """
-        pass
-
-    def testLatestQuestions(self):
-        """
-        Get latest questions.
-        """
-        pass
+#class JSONViews(TestCase):
+#    def setUp(self):
+#        """
+#        Create a normal user and an expert user, then 
+#        create a few questions and answers, some of the answers published by experts.
+#        django.test.client.Client gets confused with templates when using the cache, that's why we need to clear it.
+#        """
+#        cache.clear()
+#
+#        self.regular_user = User.objects.create_user(username='bill_normal', password='secret')
+#        self.group_expert = Group.objects.create(name=expert_groups[0])
+#        self.expert_user = User.objects.create_user(username='joe_expert', password='secret')
+#        self.expert_user.groups.add(self.group_expert)
+#        self.questions = []
+#
+#        number_questions = 24
+#        for i in range(0, number_questions):
+#            title='Question #%d' % (i, )
+#            body='This is question #%d.' % (i, )
+#            author=self.regular_user 
+#            question = Question(
+#                                title=title,
+#                                body=body,
+#                                author=author, 
+#                                status=Question.LIVE_STATUS,
+#                               )
+#            question.save()
+#            self.questions.append(question)
+#
+#        answers_map = [ 
+#                        {'question_id': 0, 'regular_answers': 0, 'expert_answers': 0, 'votes_up': 1, 'votes_down': 3},
+#                        {'question_id': 3, 'regular_answers': 2, 'expert_answers': 0, 'votes_up': 8, 'votes_down': 1},
+#                        {'question_id': 4, 'regular_answers': 1, 'expert_answers': 2, 'votes_up': 3, 'votes_down': 3},
+#                        {'question_id': 6, 'regular_answers': 0, 'expert_answers': 5, 'votes_up': 1, 'votes_down': 1},
+#                        {'question_id': 7, 'regular_answers': 3, 'expert_answers': 3, 'votes_up': 8, 'votes_down': 3},
+#                        {'question_id': 9, 'regular_answers': 0, 'expert_answers': 8, 'votes_up': 3, 'votes_down': 1},
+#                        {'question_id': 11, 'regular_answers': 2, 'expert_answers': 1, 'votes_up': 2, 'votes_down': 1},
+#                        {'question_id': 2, 'regular_answers': 3, 'expert_answers': 2, 'votes_up': 7, 'votes_down': 1},
+#                        {'question_id': 13, 'regular_answers': 5, 'expert_answers': 2, 'votes_up': 3, 'votes_down': 3},
+#                        {'question_id': 15, 'regular_answers': 1, 'expert_answers': 1, 'votes_up': 10, 'votes_down': 1},
+#                        {'question_id': 19, 'regular_answers': 0, 'expert_answers': 3, 'votes_up': 5, 'votes_down': 3},
+#                        {'question_id': 21, 'regular_answers': 2, 'expert_answers': 1, 'votes_up': 4, 'votes_down': 2},
+#                      ]
+#
+#        for item in answers_map:
+#            self.questions[item['question_id']].votes_up = item['votes_up']
+#            self.questions[item['question_id']].votes_down = item['votes_down']
+#            self.questions[item['question_id']].save()
+#            for i in range(0, item['regular_answers']):
+#                answer = Answer(
+#                                answer='Regular answer %d for question %d' % (i, item['question_id']),
+#                                user=self.regular_user,
+#                                question=self.questions[item['question_id']],
+#                               )
+#                answer.save()
+#            for i in range(0, item['expert_answers']):
+#                answer = Answer(
+#                                answer='Expert answer %d for question %d' % (i, item['question_id']),
+#                                user=self.expert_user,
+#                                question=self.questions[item['question_id']],
+#                               )
+#                answer.save()
+#
+#    def testHomeLatestExpertsQuestionsAjax(self):
+#        """
+#        Get latest questions with at least one answer by an expert.
+#        """
+#        data = {
+#                'with_experts_answers': 'experts',
+#                'type': 'latest',
+#                'start': 0,
+#                'end': 9,
+#               }
+#        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
+#        self.assertEqual(response.status_code, 200)
+#
+#        # TODO test that json results are in correct order
+#        parsed_data = json.loads(response.content)
+#        self.assertEqual(len(parsed_data), data['end'] - data['start'])
+#        for element in parsed_data:
+#            self.assertEqual(element['title'], self.questions[element['id']-1].title)
+#
+#    def testHomeMostAnsweredExpertsQuestionsAjax(self):
+#        """
+#        Get most answered questions with at least one answer by an expert.
+#        http://armitage.yourtango.com:8006/questions/get-questions/experts/answered/0/9/
+#        """
+#        data = {
+#                'with_experts_answers': 'experts',
+#                'type': 'answered',
+#                'start': 0,
+#                'end': 9,
+#               }
+#        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
+#        self.assertEqual(response.status_code, 200)
+#
+#        # TODO test that json results are in correct order
+#        parsed_data = json.loads(response.content)
+#        self.assertEqual(len(parsed_data), data['end'] - data['start'])
+#        for element in parsed_data:
+#            self.assertEqual(element['title'], self.questions[element['id']-1].title)
+#
+#    def testHomeMostVotedExpertsQuestionsAjax(self):
+#        """
+#        Get most voted questions with at least one answer by an expert.
+#        http://armitage.yourtango.com:8006/questions/get-questions/experts/voted/0/9/
+#        """
+#        data = {
+#                'with_experts_answers': 'experts',
+#                'type': 'voted',
+#                'start': 0,
+#                'end': 9,
+#               }
+#        response = self.client.get(reverse('vodkamartiniqa_questions_get_ajax', kwargs=data))
+#        self.assertEqual(response.status_code, 200)
+#
+#        # TODO test that json results are in correct order
+#        parsed_data = json.loads(response.content)
+#        self.assertEqual(len(parsed_data), data['end'] - data['start'])
+#        for element in parsed_data:
+#            self.assertEqual(element['title'], self.questions[element['id']-1].title)
+#
+#    def testHomeLatestQuestionsAjax(self):
+#        """
+#        Get latest questions with answers by only regular users.
+#        """
+#        pass
+#
+#    def testHomeMostAnsweredQuestionsAjax(self):
+#        """
+#        Get latest questions with answers by only regular users.
+#        """
+#        pass
+#
+#    def testHomeMostVotedQuestionsAjax(self):
+#        """
+#        Get latest questions with answers by only regular users.
+#        """
+#        pass
+#
+#    def testLatestQuestions(self):
+#        """
+#        Get latest questions.
+#        """
+#        pass
