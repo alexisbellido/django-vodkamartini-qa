@@ -4,7 +4,7 @@ from django.db.models import F
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404
 from vodkamartiniqa.models import Question
 from vodkamartiniqa import signals
 from vodkamartiniqa.forms import QuestionForm, AnswerForm
@@ -96,14 +96,24 @@ def questions_index(request, page=1):
         request.session.set_test_cookie()
         current_site = get_current_site(request)
 
-    return render_to_response('vodkamartiniqa/question_list.html',
-                              {
-                                'object_list': questions_list,
-                                'experts_object_list': experts_questions_list,
-                                'form': form,
-                                'next': redirect_to,
-                              },
-                              RequestContext(request))
+    #return render_to_response('vodkamartiniqa/question_list.html',
+    #                          {
+    #                            'object_list': questions_list,
+    #                            'experts_object_list': experts_questions_list,
+    #                            'form': form,
+    #                            'next': redirect_to,
+    #                          },
+    #                          RequestContext(request))
+
+    return render(request, 
+                  'vodkamartiniqa/question_list.html',
+                  {
+                    'object_list': questions_list,
+                    'experts_object_list': experts_questions_list,
+                    'form': form,
+                    'next': redirect_to,
+                  },
+                  )
 
     #paginate_by = 9 
     #paginator = Paginator(questions_list, paginate_by)
