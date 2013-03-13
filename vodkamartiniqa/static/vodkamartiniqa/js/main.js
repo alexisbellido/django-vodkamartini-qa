@@ -19,7 +19,7 @@ $(document).ready(function() {
                     //console.log('from jQuery done (success) jqXHR.status: ' + jqXHR.status);
                     //console.log('from jQuery done (success) data: ' + data);
                     //// if data is a json object, check attributes
-                    target.parent().parent().find('.votes-up').html(data.votes_up);
+                    target.parent().find('.votes-up').html(data.votes_up);
                     target.toggleClass('vote-up-on').toggleClass('vote-up-off');
                 })
                 .fail(function(jqXHR, errorType, errorException) { // error
@@ -53,7 +53,7 @@ $(document).ready(function() {
                     //console.log('from jQuery done (success) jqXHR.status: ' + jqXHR.status);
                     //console.log('from jQuery done (success) data: ' + data);
                     //// if data is a json object, check attributes
-                    target.parent().parent().find('.votes-down').html(data.votes_down);
+                    target.parent().find('.votes-down').html(data.votes_down);
                     target.toggleClass('vote-down-on').toggleClass('vote-down-off');
                 })
                 .fail(function(jqXHR, errorType, errorException) { // error
