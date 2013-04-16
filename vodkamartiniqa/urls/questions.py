@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('vodkamartiniqa.views.top',
     url(r'^top-questioners/$', 'questioners', name='vodkamartiniqa_top_questioners'),
