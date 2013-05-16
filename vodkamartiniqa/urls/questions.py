@@ -1,14 +1,8 @@
 from django.conf.urls import patterns, include, url
-from ..api import QuestionResource
 
-question_resource = QuestionResource()
 
 urlpatterns = patterns('vodkamartiniqa.views.top',
     url(r'^top-questioners/$', 'questioners', name='vodkamartiniqa_top_questioners'),
-)
-
-urlpatterns += patterns('',
-    url(r'^api/', include(question_resource.urls)),
 )
 
 urlpatterns += patterns('vodkamartiniqa.views.questions',

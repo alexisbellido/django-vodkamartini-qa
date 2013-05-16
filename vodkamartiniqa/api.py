@@ -1,8 +1,17 @@
+from django.contrib.auth.models import User
+from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from .models import Question
 
+class UserResource(ModelResource):
+    class Meta:
+        queryset = User.objects.all()
+        resource_name = 'user'
+        authorization= Authorization()
+
 class QuestionResource(ModelResource):
+    author = fields.ForeignKey(UserResource, 'author')
     class Meta:
         queryset = Question.live.all()
         resource_name = 'question'
